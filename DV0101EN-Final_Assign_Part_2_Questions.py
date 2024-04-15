@@ -71,7 +71,7 @@ def update_input_container(selected_statistics):
 # Define the callback function to update the input container based on the selected statistics
 @app.callback(
     Output(component_id='output-container', component_property='children'),
-    [Input(component_id='select-year', component_property='value'), Input(component_id='dropdown-statistics', component_property='value')])
+    [Input(component_id='dropdown-statistics', component_property='value'), Input(component_id='select-year', component_property='value')])
 def update_output_container(selected_statistics, input_year):
     if selected_statistics == 'Recession Period Statistics':
         # Filter the data for recession periods
@@ -99,13 +99,19 @@ def update_output_container(selected_statistics, input_year):
         R_chart3 = dcc.Graph(figure=fig3)
 
 # Plot 4 bar chart for the effect of unemployment rate on vehicle type and sales
-        fig4 = px.bar(recession_data, x='Unemployment_Rate', y='Automobile_Sales', hue='Vehicle_Type', title = 'Effect of unemployment rate on vehicle type and sales')
-        R_chart4 = dcc.Graph(figure=fig4)
+        unemp_data= recession_data.groupby(['Vehicle_Type', 'unemployment_rate'])['Automobile_Sales'].mean().reset_index()
+        R_chart4 = dcc.Graph(
+              figure=px.bar(unemp_data,
+                  x='unemployment_rate',
+                  y='Automobile_Sales',
+                  labels={'unemployment_rate': 'Unemployment Rate', 'Automobile_Sales': 'Average Automobile Sales'},
+                  title="Effect of Unemployment Rate on Sales of various Vehicle Types")
+          )
 
         return [
-            html.Div(className='chart-grid', children=[html.Div(children=R_chart1),html.Div(children=R_chart2)]),
-            html.Div(className='chart-grid', children=[html.Div(children=R_chart3),html.Div(children=R_chart4)])
-            ]
+        html.Div(className='chart-item', children=[html.Div(children=R_chart1),html.Div(children=R_chart2)],style={'display': 'flex'}),
+        html.Div(className='chart-item', children=[html.Div(children=R_chart3),html.Div(children=R_chart4)],style={'display': 'flex'})
+        ]
 
 # TASK 2.6: Create and display graphs for Yearly Report Statistics
  # Yearly Statistic Report Plots                             
@@ -118,8 +124,7 @@ def update_output_container(selected_statistics, input_year):
         Y_chart1 = dcc.Graph(figure= chart1)
             
 # Plot 2 Total Monthly Automobile sales using line chart.
-        mas= yearly_data.groupby('Month')['Automobile_Sales'].mean().reset_index()
-        chart2 = px.line(mas, x='Month', y='Automobile_Sales', title='Monthly Automobile Sales')
+        chart2 = px.line(yearly_data, x='Month', y='Automobile_Sales', title='Monthly Automobile Sales')
         Y_chart2 = dcc.Graph(figure= chart2)
 
 # Plot bar chart for average number of vehicles sold during the given year
@@ -134,9 +139,9 @@ def update_output_container(selected_statistics, input_year):
 
 #Returning the graphs for displaying Yearly data
         return [
-                html.Div(className='chart-grid', children=[html.Div(Y_chart1),html.Div(Y_chart2)]),
-                html.Div(className='chart-grid', children=[html.Div(Y_chart3),html.Div(Y_chart4)])
-                ]
+        html.Div(className='chart-item', children=[html.Div(children=Y_chart1),html.Div(children=Y_chart2)],style={'display': 'flex'}),
+        html.Div(className='chart-item', children=[html.Div(children=Y_chart3),html.Div(children=Y_chart4)],style={'display': 'flex'})
+        ]
         
     else:
         return None
