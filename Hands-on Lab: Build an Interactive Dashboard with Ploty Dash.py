@@ -48,7 +48,7 @@ app.layout = html.Div(children=[html.H1('SpaceX Launch Records Dashboard',
                                                 min=0, max=10000, step=1000,
                                                 marks={0: '0',
                                                        100: '100'},
-                                                value=[min_value, max_value])
+                                                value=[min_value, max_value]),
 
                                 # TASK 4: Add a scatter chart to show the correlation between payload and launch success
                                 html.Div(dcc.Graph(id='success-payload-scatter-chart')),
@@ -68,8 +68,9 @@ def get_pie_chart(entered_site):
         return fig
     else:
         # return the outcomes piechart for a selected site
-        filtered_df = filtered_df['Launch Site']
-        fig = px.pie(filtered_df, values='class', 
+        filtered_df = spacex_df[spacex_df['Launch Site']== entered_site]  
+        filtered_df = filtered_df.groupby(['Launch Site','class']).size().reset_index(name='class count')
+        fig = px.pie(filtered_df, values='class count', 
         names='class', 
         title='Success-pie-chart')
         return fig
@@ -79,8 +80,8 @@ def get_pie_chart(entered_site):
 @app.callback(Output(component_id='success-payload-scatter-chart', component_property='figure'),
               Input(component_id='site-dropdown', component_property='value'),
               Input(component_id='payload-slider', component_property='value'))
-def get_scatter_chart(entered_site):
-    filtered_df = spacex_df
+def get_scatter_chart(entered_site, payload):
+    filtered_df = spacex_df[spacex_df['Payload Mass (kg)']]
     if entered_site == 'ALL':
         fig = px.scatter(filtered_df, 
         x='Payload Mass (kg)', 
@@ -90,14 +91,13 @@ def get_scatter_chart(entered_site):
         return fig
     else:
         # return the outcomes piechart for a selected site
-        filtered_df = filtered_df['Launch Site']
+        filtered_df = filtered_df[filtered_df['Launch Site']==entered_site]
         fig = px.scatter(filtered_df, 
         x='Payload Mass (kg)', 
         y='class',
         color='Booster Version Category'
         title='Success-payload-scatter-chart')
         return fig
-
 
 # Run the app
 if __name__ == '__main__':
