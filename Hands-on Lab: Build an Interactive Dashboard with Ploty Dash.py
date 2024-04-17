@@ -48,7 +48,7 @@ app.layout = html.Div(children=[html.H1('SpaceX Launch Records Dashboard',
                                                 min=0, max=10000, step=1000,
                                                 marks={0: '0',
                                                        100: '100'},
-                                                value=[min_value, max_value]),
+                                                value=[min_payload, max_payload]),
 
                                 # TASK 4: Add a scatter chart to show the correlation between payload and launch success
                                 html.Div(dcc.Graph(id='success-payload-scatter-chart')),
@@ -86,7 +86,7 @@ def get_scatter_chart(entered_site, payload):
         fig = px.scatter(filtered_df, 
         x='Payload Mass (kg)', 
         y='class',
-        color='Booster Version Category'
+        color='Booster Version Category',
         title='Success-payload-scatter-chart')
         return fig
     else:
@@ -95,7 +95,7 @@ def get_scatter_chart(entered_site, payload):
         fig = px.scatter(filtered_df, 
         x='Payload Mass (kg)', 
         y='class',
-        color='Booster Version Category'
+        color='Booster Version Category',
         title='Success-payload-scatter-chart')
         return fig
 
